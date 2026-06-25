@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>계리패스 AI — 공무원 합격 학습앱</title>
+<!-- PWA: 스마트폰/태블릿 앱 설치 지원 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0D47A1">
+<meta name="description" content="계리직 공무원 합격을 위한 AI 1:1 학습앱">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="계리패스 AI">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root {
+  /* 전문적 공무원 수험앱 색상 팔레트 — 딥블루 + 화이트 톤 */
+  --primary: #0D47A1;      /* 진한 파란색 */
+  --primary2: #1565C0;     /* 파란색 */
+  --accent: #E91E63;       /* 핑크 액센트 */
+  --bg1: #F5F7FA;          /* 밝은 회색-파란 */
+  --bg2: #FFFFFF;          /* 화이트 */
+  --surface: #FFFFFF;
+  --surface-2: #F5F7FA;
+  --ink: #1A1F36;          /* 진한 회색 */
+  --sub: #64748B;          /* 밝은 회색 */
+  --line: #E2E8F0;
+  --success: #10B981;
+  --error: #EF4444;
+  --postal: #0D47A1;
+  --savings: #1565C0;
+  --insurance: #7C3AED;
+  --computer: #F59E0B;
+  --shadow-sm: 0 2px 8px rgba(13, 71, 161, 0.08);
+  --shadow: 0 8px 24px rgba(13, 71, 161, 0.12);
+  --shadow-lg: 0 16px 40px rgba(13, 71, 161, 0.16);
+  --r-lg: 24px;
+  --r-md: 16px;
+  --r-sm: 12px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+  line-height: 1.6;
+}
+
+.wrap { max-width: 1024px; margin: 0 auto; padding: 20px 16px 80px; }
+
+/* ===== 헤더 ===== */
+header.top {
+  display: flex; align-items: center; gap: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  border-radius: var(--r-md);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  color: white;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 56px; height: 56px; flex: 0 0 56px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+header.top h1 { margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -0.5px; }
+header.top .desc { font-size: 13px; color: rgba(255, 255, 255, 0.85); margin-top: 3px; }
+
+.headright { margin-left: auto; text-align: right; }
+.chip {
+  display: inline-block; font-size: 12px; font-weight: 700;
+  color: var(--primary);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 999px; padding: 6px 12px;
+  margin-bottom: 8px;
+}
+
+.scorebadge {
+  font-size: 14px; font-weight: 800; color: white;
+  background: linear-gradient(135deg, var(--accent), #D81B60);
+  border-radius: 999px; padding: 8px 14px;
+  display: inline-block;
+  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+}
+
+/* ===== 탭 ===== */
+.tabs {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin: 16px 0;
+}
+
+.tab {
+  border: none; cursor: pointer;
+  padding: 16px 8px; border-radius: var(--r-md);
+  background: var(--surface); color: var(--sub);
+  font-size: 14px; font-weight: 800;
+  font-family: inherit;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, color 0.2s, background 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+
+.tab .ico { font-size: 24px; line-height: 1; }
+.tab:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.tab:active { transform: translateY(0) scale(0.96); }
+
+.tab.active { color: white; transform: translateY(-2px); box-shadow: var(--shadow); }
+.tab.active[data-s="postal"] { background: linear-gradient(135deg, var(--postal), #1565C0); }
+.tab.active[data-s="savings"] { background: linear-gradient(135deg, var(--savings), #0D47A1); }
+.tab.active[data-s="insurance"] { background: linear-gradient(135deg, var(--insurance), #6D28D9); }
+.tab.active[data-s="computer"] { background: linear-gradient(135deg, var(--computer), #D97706); }
+
+/* ===== 컨트롤 바 ===== */
+.controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  background: var(--surface); border-radius: var(--r-md);
+  padding: 14px 16px; box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+
+.ctl-group { display: flex; align-items: center; gap: 8px; }
+.ctl-group > label { font-size: 12px; font-weight: 800; color: var(--sub); }
+
+.seg {
+  display: inline-flex;
+  background: var(--surface-2);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 3px;
+}
+
+.seg button {
+  border: none; cursor: pointer; font-family: inherit;
+  padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 800;
+  background: transparent; color: var(--sub);
+  transition: transform 0.12s, background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.seg button:hover { color: var(--ink); }
+.seg button:active { transform: scale(0.93); }
+.seg button.on {
+  background: var(--primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.spacer { margin-left: auto; }
+
+/* ===== 공통 버튼 ===== */
+.btn {
+  border: none; cursor: pointer; font-family: inherit;
+  font-size: 14px; font-weight: 800; color: white;
+  padding: 12px 20px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, filter 0.2s;
+}
+
+.btn:hover { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 8px 20px rgba(13, 71, 161, 0.4); }
+.btn:active { transform: translateY(0) scale(0.95); }
+.btn.ghost {
+  background: white;
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn.ghost:hover { box-shadow: var(--shadow); }
+.btn.small { padding: 9px 14px; font-size: 12px; border-radius: 10px; }
+
+/* ===== 설정 패널 ===== */
+.settings {
+  display: none;
+  background: var(--surface);
+  border-radius: var(--r-md);
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  border: 2px dashed var(--line);
+}
+
+.settings.show { display: block; animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.settings h3 { margin: 0 0 4px; font-size: 16px; font-weight: 900; }
+.settings .hint { font-size: 12px; color: var(--sub); margin-bottom: 12px; }
+
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+.field .keytag {
+  font-size: 11px; font-weight: 700; color: white;
+  padding: 2px 8px; border-radius: 999px; margin-left: 6px;
+}
+
+.tag-g { background: linear-gradient(135deg, #0D47A1, #1565C0); }
+.tag-o { background: linear-gradient(135deg, #34C77B, #16a34a); }
+
+input[type=text], input[type=password], input[type=url], input[type=file], select {
+  width: 100%; font-family: inherit; font-size: 13px; color: var(--ink);
+  padding: 11px 13px; border-radius: 12px; border: 2px solid var(--line);
+  background: var(--surface-2);
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+input[type=text]:focus, input[type=password]:focus, input[type=url]:focus, input[type=file]:focus, select:focus {
+  outline: none; border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.1);
+  background: white;
+}
+
+select { appearance: none; cursor: pointer; }
+
+.row {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+}
+
+.switch {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-weight: 800; cursor: pointer; user-select: none;
+}
+
+.switch input { display: none; }
+.switch .track {
+  width: 48px; height: 28px; border-radius: 999px;
+  background: #D9DEEC; position: relative;
+  transition: background 0.25s;
+}
+
+.switch .track::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: white; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s;
+}
+
+.switch input:checked + .track {
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+}
+
+.switch input:checked + .track::after {
+  transform: translateX(20px);
+}
+
+/* ===== 문제 영역 ===== */
+.panel { display: none; }
+.panel.active { display: block; animation: fade 0.35s ease; }
+
+.secthead {
+  display: flex; align-items: center; gap: 12px;
+  margin: 4px 2px 14px;
+}
+
+.secthead .bar {
+  width: 6px; height: 28px; border-radius: 4px;
+}
+
+.secthead h2 { margin: 0; font-size: 22px; font-weight: 900; }
+.secthead .cnt {
+  margin-left: auto; font-size: 12px; font-weight: 800;
+  color: var(--sub); background: white;
+  padding: 6px 12px; border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+}
+
+.loading {
+  display: none; align-items: center; gap: 12px;
+  justify-content: center; padding: 40px;
+  color: var(--sub); font-weight: 800; font-size: 14px;
+}
+
+.loading.show { display: flex; }
+.spin {
+  width: 28px; height: 28px;
+  border: 4px solid #E5E9F5;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.q {
+  background: var(--surface);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.q:hover { box-shadow: var(--shadow); }
+
+.pcard {
+  background: linear-gradient(135deg, #FAFBFC, #F5F7FA);
+  border: 2px solid var(--line);
+}
+
+.phead {
+  font-weight: 900; font-size: 14px;
+  margin-bottom: 10px; color: var(--primary);
+}
+
+.passage {
+  white-space: pre-wrap; font-size: 14px; line-height: 1.8;
+  background: white; border-radius: var(--r-sm);
+  padding: 14px 16px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.qno {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px;
+}
+
+.qno .num {
+  font-size: 18px; font-weight: 900; color: var(--primary);
+}
+
+.qno .type {
+  font-size: 11px; font-weight: 800; color: var(--sub);
+  background: var(--surface-2); padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.qtext {
+  font-size: 16px; font-weight: 700; line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.figure {
+  margin: 8px 0 12px;
+  display: flex; justify-content: center;
+}
+
+.figure svg { max-width: 100%; height: auto; }
+
+.speaker {
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer; border: none; font-family: inherit;
+  font-size: 13px; font-weight: 800; color: white;
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  padding: 10px 14px; border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
+  transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+}
+
+.speaker:hover { transform: translateY(-2px); filter: brightness(1.05); }
+.speaker:active { transform: scale(0.95); }
+.speaker.playing {
+  background: linear-gradient(135deg, var(--accent), #D81B60);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+.opts {
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.opt {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; padding: 12px 14px;
+  border-radius: var(--r-sm);
+  border: 2px solid var(--line);
+  background: var(--surface-2);
+  font-size: 15px; font-weight: 600;
+  transition: transform 0.12s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.opt:hover { border-color: var(--primary); transform: translateX(3px); }
+.opt:active { transform: scale(0.99); }
+
+.opt .mark {
+  font-size: 16px; font-weight: 900;
+  color: var(--sub); flex: 0 0 auto;
+}
+
+.opt.sel {
+  border-color: var(--primary);
+  background: rgba(13, 71, 161, 0.06);
+  box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.1);
+}
+
+.opt.correct {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.08);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+}
+
+.opt.wrong {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.short input { margin-top: 4px; }
+input.correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.08) !important; }
+input.wrong { border-color: var(--error) !important; background: rgba(239, 68, 68, 0.08) !important; }
+
+.qactions {
+  display: flex; gap: 8px; margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.explain {
+  display: none; margin-top: 10px;
+  padding: 12px 14px; border-radius: var(--r-sm);
+  font-size: 13px; line-height: 1.6;
+  background: rgba(16, 185, 129, 0.08);
+  border-left: 4px solid var(--success);
+}
+
+.explain.show { display: block; animation: fade 0.3s ease; }
+.explain.miss {
+  background: rgba(239, 68, 68, 0.08);
+  border-left-color: var(--error);
+}
+
+.actions {
+  display: flex; gap: 10px; margin: 18px 0 12px;
+  flex-wrap: wrap;
+}
+
+.result {
+  display: none; text-align: center;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 26px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+
+.result.show { display: block; animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.result .stars { font-size: 32px; letter-spacing: 3px; }
+.result .score { font-size: 40px; font-weight: 900; margin: 6px 0; }
+.result .score small { font-size: 16px; color: var(--sub); font-weight: 800; }
+.result .msg { font-size: 15px; font-weight: 800; color: var(--sub); margin-top: 6px; }
+
+/* ===== 오답 노트 ===== */
+.note-section {
+  background: var(--surface);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 14px;
+  border-left: 4px solid var(--error);
+}
+
+.note-section h4 {
+  margin: 0 0 10px; font-size: 14px;
+  color: var(--error); font-weight: 800;
+}
+
+.note-item {
+  display: flex; align-items: flex-start;
+  gap: 10px; margin-bottom: 8px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--line);
+}
+
+.note-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.note-num { font-weight: 800; color: var(--primary); flex: 0 0 20px; }
+.note-text { flex: 1; font-size: 13px; line-height: 1.5; }
+
+/* ===== 토스트 ===== */
+.toast {
+  position: fixed; left: 50%; bottom: 32px;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(26, 31, 54, 0.96);
+  color: white; font-weight: 700; font-size: 13px;
+  padding: 12px 20px; border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  opacity: 0; pointer-events: none;
+  transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1000; max-width: 90vw; text-align: center;
+}
+
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== 모달 ===== */
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(26, 31, 54, 0.4);
+  backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+  z-index: 900; padding: 16px;
+}
+
+.modal.show { display: flex; animation: fade 0.25s ease; }
+
+.card {
+  background: white; border-radius: var(--r-lg);
+  padding: 24px; max-width: 800px; width: 100%;
+  box-shadow: var(--shadow-lg);
+  animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height: 90vh; overflow: auto;
+}
+
+.card h2 { margin-top: 0; }
+.card h3 { margin-top: 0; }
+
+.fileUploadBox {
+  border: 2px dashed var(--line);
+  border-radius: var(--r-md);
+  padding: 20px; text-align: center;
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.fileUploadBox:hover {
+  border-color: var(--primary);
+  background: rgba(13, 71, 161, 0.04);
+}
+
+.footer {
+  text-align: center; color: var(--sub);
+  font-size: 12px; margin-top: 20px;
+}
+
+/* ===== 공식 자료 검색 결과 ===== */
+.searchbar { display: flex; gap: 8px; margin-bottom: 12px; }
+.searchbar input { flex: 1; }
+
+.sresults { display: flex; flex-direction: column; gap: 10px; max-height: 48vh; overflow: auto; }
+
+.sresult {
+  border: 2px solid var(--line); border-radius: var(--r-sm);
+  padding: 12px 14px; background: var(--surface-2);
+  transition: border-color 0.2s, transform 0.12s, box-shadow 0.2s;
+}
+
+.sresult:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
+.sresult .stitle { font-size: 14px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+.sresult .slink { font-size: 11px; color: var(--success); word-break: break-all; margin-bottom: 6px; }
+.sresult .ssnip { font-size: 12px; color: var(--sub); line-height: 1.5; margin-bottom: 8px; }
+.sresult .sactions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ===== 대시보드 ===== */
+.dashboard {
+  display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 247, 250, 0.9));
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px 18px;
+  margin: 12px 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.dash-level {
+  display: flex; align-items: center; gap: 12px;
+  min-width: 240px; flex: 1;
+}
+
+.lvring {
+  width: 56px; height: 56px; flex: 0 0 56px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 900;
+  color: var(--primary);
+  background: conic-gradient(var(--primary) var(--p, 0%), #E8E5FF 0);
+  position: relative;
+  animation: ringspin 8s linear infinite;
+}
+
+.lvring::after {
+  content: ""; position: absolute; inset: 3px;
+  border-radius: 50%; background: white;
+}
+
+.lvring span { position: relative; z-index: 1; }
+@keyframes ringspin { to { filter: hue-rotate(10deg); } }
+
+.dash-title { font-size: 13px; font-weight: 900; }
+.dash-sub { font-size: 11px; color: var(--sub); font-weight: 700; margin-top: 2px; }
+
+.xpbar {
+  width: 100%; max-width: 200px; height: 10px;
+  border-radius: 999px; background: #E8E5FF;
+  overflow: hidden; margin: 4px 0;
+}
+
+.xpfill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary), var(--primary2));
+  width: 0; transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dash-badges {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+
+.badge {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  width: 56px; padding: 6px 3px;
+  border-radius: 14px; background: var(--surface-2);
+  font-size: 10px; font-weight: 800;
+  color: var(--sub);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+  filter: grayscale(1); opacity: 0.5;
+}
+
+.badge .bico { font-size: 22px; }
+.badge.earned {
+  filter: none; opacity: 1; color: var(--ink);
+  background: white; box-shadow: var(--shadow-sm);
+  animation: badgePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.badge.earned:hover { transform: translateY(-2px) rotate(-2deg); }
+
+/* ===== 대시보드 통계 (D-Day · 합격예상) ===== */
+.dash-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat-card {
+  display: flex; align-items: center; gap: 10px;
+  background: white; border-radius: 14px;
+  padding: 10px 14px; box-shadow: var(--shadow-sm);
+  min-width: 130px;
+}
+.stat-ico { font-size: 24px; }
+.stat-val { font-size: 18px; font-weight: 900; color: var(--primary); line-height: 1.1; }
+.stat-sub { font-size: 11px; font-weight: 800; color: var(--sub); margin-top: 2px; }
+.stat-date {
+  width: 130px !important; font-size: 11px !important;
+  padding: 2px 4px !important; margin-top: 3px;
+  border: 1px solid var(--line) !important; border-radius: 6px !important;
+  background: var(--surface-2) !important; cursor: pointer;
+}
+#passCard.safe .stat-val { color: var(--success); }
+#passCard.warn .stat-val { color: var(--computer); }
+#passCard.danger .stat-val { color: var(--error); }
+
+/* ===== 합격 응원 메시지 ===== */
+.cheer {
+  margin: 0 0 16px; padding: 14px 18px;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, rgba(233,30,99,0.1), rgba(13,71,161,0.08));
+  border: 1px dashed rgba(233,30,99,0.3);
+  font-size: 14px; font-weight: 800; color: var(--ink);
+  text-align: center; line-height: 1.6;
+}
+.cheer b { color: var(--accent); }
+
+@keyframes badgePop {
+  0% { transform: scale(0.4) rotate(-20deg); }
+  60% { transform: scale(1.2) rotate(8deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+
+@media (max-width: 560px) {
+  .wrap { padding: 12px 10px 60px; }
+  header.top { padding: 14px; }
+  header.top h1 { font-size: 18px; }
+  .logo { width: 44px; height: 44px; font-size: 22px; }
+  .tabs { grid-template-columns: repeat(2, 1fr); }
+  .tab { font-size: 12px; }
+  .qtext { font-size: 15px; }
+  .controls { padding: 12px; }
+  .ctl-group > label { font-size: 11px; }
+}
+
+@media print {
+  body { background: white; }
+  .tabs, .controls, .settings, .actions, .btn, .toast, .modal {
+    display: none !important;
+  }
+  .panel { display: block !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="logo">🎓</div>
+    <div>
+      <h1>계리패스 AI</h1>
+      <div class="desc">AI 맞춤형 공무원 시험 학습 · Gemini 3.5 Flash/Pro</div>
+    </div>
+    <div class="headright">
+      <div class="chip" id="gradeChip">우정사업본부 공채 · 2024년 이후</div>
+      <div class="scorebadge" id="starBadge">⭐ 0</div>
+    </div>
+  </header>
+
+  <div class="dashboard" id="dashboard">
+    <div class="dash-level">
+      <div class="lvring" id="lvring"><span id="lvnum">1</span></div>
+      <div style="flex:1">
+        <div class="dash-title">📚 합격 준비 레벨 <span id="lvlabel" style="color:var(--primary2)">Lv.1</span></div>
+        <div class="xpbar"><div class="xpfill" id="xpfill"></div></div>
+        <div class="dash-sub" id="xptext">문제를 풀면 경험치(XP)와 별이 쌓여요!</div>
+      </div>
+    </div>
+
+    <div class="dash-stats">
+      <div class="stat-card" id="ddayCard" title="시험 날짜를 눌러 설정하세요">
+        <div class="stat-ico">📅</div>
+        <div>
+          <div class="stat-val" id="ddayVal">D-?</div>
+          <input type="date" id="examDate" class="stat-date">
+        </div>
+      </div>
+      <div class="stat-card" id="passCard">
+        <div class="stat-ico">🎯</div>
+        <div>
+          <div class="stat-val" id="passVal">--%</div>
+          <div class="stat-sub" id="passLabel">합격 예상</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-badges" id="dashBadges"></div>
+  </div>
+
+  <div class="cheer" id="cheerMsg"></div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-s="postal"><span class="ico">📮</span>우편일반</button>
+    <button class="tab" data-s="savings"><span class="ico">🏦</span>예금일반</button>
+    <button class="tab" data-s="insurance"><span class="ico">🛡️</span>보험일반</button>
+    <button class="tab" data-s="computer"><span class="ico">💻</span>컴퓨터일반</button>
+  </div>
+
+  <div class="controls">
+    <div class="ctl-group">
+      <label>난이도</label>
+      <div class="seg" id="diffSeg">
+        <button data-d="기본" class="on">기본</button>
+        <button data-d="실전">실전</button>
+        <button data-d="심화">심화</button>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <button id="installBtn" class="btn small" style="display:none">📲 앱 설치</button>
+    <button id="uploadBtn" class="btn ghost small">📄 자료 입력</button>
+    <button id="reroll" class="btn ghost small">🔄 새 문제</button>
+    <button id="gear" class="btn ghost small">⚙️ 설정</button>
+  </div>
+
+  <div class="settings" id="settings">
+    <h3>⚙️ 키 설정 (두 개만 넣으면 끝!)</h3>
+    <div class="hint">아래 <b>Gemini 키</b>와 <b>OpenAI 키</b> 두 개만 입력하고 저장하면 AI 문제 생성·음성 읽기까지 모두 자동으로 켜집니다. 키는 이 기기(브라우저)에만 안전하게 저장됩니다.</div>
+
+    <div class="field">
+      <label>① Google Gemini API 키 <span class="keytag tag-g">필수</span></label>
+      <input type="password" id="gkey" placeholder="AIza... 형태의 API 키">
+    </div>
+
+    <div class="field">
+      <label>② OpenAI API 키 <span class="keytag tag-o">음성</span></label>
+      <input type="password" id="okey" placeholder="sk-... 형태의 OpenAI API 키 (문제 읽어주기)">
+    </div>
+
+    <div class="field">
+      <label>Gemini 모델 선택</label>
+      <select id="gmodel">
+        <option value="gemini-3.5-flash">gemini-3.5-flash (빠름 · 추천)</option>
+        <option value="gemini-3.1-pro">gemini-3.1-pro (정확함)</option>
+      </select>
+    </div>
+
+    <details style="margin-bottom:12px">
+      <summary style="cursor:pointer;font-size:13px;font-weight:800;color:var(--sub)">🔧 고급 설정 — 공식 자료 검색 (선택, 안 넣어도 됨)</summary>
+      <div class="hint" style="margin-top:8px">아래 두 값을 넣으면 '자료 입력 → 공식 자료 검색' 탭이 켜집니다. 비워두면 직접 입력/주제 생성으로 사용합니다.</div>
+      <div class="field">
+        <label>Google Custom Search API 키</label>
+        <input type="password" id="skey" placeholder="공식 자료 URL 검색용">
+      </div>
+      <div class="field">
+        <label>Google Search Engine ID (cx)</label>
+        <input type="password" id="cxid" placeholder="Custom Search Engine ID">
+      </div>
+    </details>
+
+    <label class="switch field" style="display:flex">
+      <input type="checkbox" id="aiToggle"> <span class="track"></span>
+      <span>AI로 맞춤형 문제 생성 <span style="font-weight:600;color:var(--sub);font-size:12px">(Gemini 키 저장 시 자동 켜짐)</span></span>
+    </label>
+
+    <div class="row" style="margin-top:8px">
+      <button id="saveKey" class="btn small">💾 저장하기</button>
+      <button id="clearKey" class="btn ghost small">🗑 모두 지우기</button>
+      <span class="keystat" id="keyStat" style="font-size:11px"></span>
+    </div>
+  </div>
+
+  <div id="app"></div>
+
+  <!-- 오답 노트 영역 -->
+  <div id="wrongNoteArea"></div>
+
+  <div class="footer">
+    🎯 계리패스 AI는 Gemini API로 2024년 이후 최신 시험 기출문제를 기반으로 맞춤형 문제를 생성합니다.
+  </div>
+
+</div>
+
+<canvas id="confetti" style="position:fixed;inset:0;pointer-events:none;z-index:1100"></canvas>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="card" id="modalCard"></div></div>
+
+<script>
+/* ============================================================
+   계리패스 AI — 공무원 시험 학습 애플리케이션
+   Gemini 3.5 Flash/Pro + Google Custom Search API
+   ============================================================ */
+
+const COUNT = 20;
+const SUBJECTS = ['postal', 'savings', 'insurance', 'computer'];
+const SUBINFO = {
+  postal: { name: '우편일반', color: '#0D47A1' },
+  savings: { name: '예금일반', color: '#1565C0' },
+  insurance: { name: '보험일반', color: '#7C3AED' },
+  computer: { name: '컴퓨터일반', color: '#F59E0B' }
+};
+
+const DIFFICULTY = ['기본', '실전', '심화'];
+const state = {
+  grade: 'postal',
+  diff: '실전',
+  active: 'postal',
+  cur: {},
+  answers: {},
+  ai: false,
+  wrongNotes: {}  // 과목별 오답 저장
+};
+
+/* ========== 유틸 함수 ========== */
+function R(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+function pickR(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function norm(s) {
+  return (s == null ? '' : String(s)).toLowerCase()
+    .replace(/\s+/g, '').replace(/[.,!?"''""]/g, '').trim();
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ========== 음성 읽기 (OpenAI TTS, 키 없으면 브라우저 내장 음성으로 자동 폴백) ========== */
+let _audio = null;
+function _stopAudio() {
+  if (_audio) { try { _audio.pause(); } catch (e) {} _audio = null; }
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  document.querySelectorAll('.speaker.playing').forEach(b => b.classList.remove('playing'));
+}
+async function speak(text, btn) {
+  if (!text) return;
+  // 같은 버튼을 다시 누르거나 재생 중이면 정지(토글)
+  const wasPlaying = btn && btn.classList.contains('playing');
+  _stopAudio();
+  if (wasPlaying) return;
+
+  const okey = localStorage.getItem('okey');
+  if (okey) {
+    try {
+      if (btn) btn.classList.add('playing');
+      const resp = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + okey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'tts-1', voice: 'nova', input: text.slice(0, 2000), speed: 0.95 })
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const url = URL.createObjectURL(await resp.blob());
+      _audio = new Audio(url);
+      _audio.onended = () => { URL.revokeObjectURL(url); if (btn) btn.classList.remove('playing'); _audio = null; };
+      _audio.onerror = () => { if (btn) btn.classList.remove('playing'); };
+      await _audio.play();
+      return;
+    } catch (e) {
+      console.error('OpenAI 음성 실패 — 브라우저 음성으로 대체:', e);
+      if (btn) btn.classList.remove('playing');
+      // 아래 브라우저 음성으로 폴백
+    }
+  }
+  // 폴백: 브라우저 내장 음성 (무료, OpenAI 키 없이도 동작)
+  if (window.speechSynthesis) {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ko-KR'; u.rate = 0.95;
+    if (btn) { btn.classList.add('playing'); u.onend = () => btn.classList.remove('playing'); }
+    speechSynthesis.speak(u);
+  } else {
+    toast('이 브라우저는 음성 읽기를 지원하지 않습니다.');
+  }
+}
+
+/* ========== 로컬 문제 은행 (기본값) ========== */
+const QUESTIONBANK = {
+  postal: {
+    기본: [
+      {
+        t: '객관식',
+        q: '우정사업본부의 주요 기능으로 가장 적절한 것은?',
+        o: ['국방력 강화', '국민 편의 우편서비스 제공', '금리 결정', '재정 관리'],
+        a: 1,
+        e: '우정사업본부는 국민을 위한 우편서비스를 제공합니다.'
+      }
+    ],
+    실전: [
+      {
+        t: '객관식',
+        q: '다음 중 우편 배송 시간이 가장 짧은 것은?',
+        o: ['일반우편', '등기우편', '속달우편', '소포'],
+        a: 2,
+        e: '속달우편이 가장 빠른 서비스입니다.'
+      }
+    ],
+    심화: []
+  },
+  savings: {
+    기본: [
+      {
+        t: '객관식',
+        q: '예금 상품의 가장 중요한 특징은?',
+        o: ['원금 보장', '높은 수익률', '제한 없는 출금', '환전 불가'],
+        a: 0,
+        e: '예금은 원금을 보장하고 이자를 지급합니다.'
+      }
+    ],
+    실전: [],
+    심화: []
+  },
+  insurance: {
+    기본: [
+      {
+        t: '객관식',
+        q: '보험의 기본 원리는?',
+        o: ['높은 수익 보장', '위험 공동 분담', '원금 보장', '환전 제한'],
+        a: 1,
+        e: '보험은 위험을 공동으로 분담하는 상호부조 원리입니다.'
+      }
+    ],
+    실전: [],
+    심화: []
+  },
+  computer: {
+    기본: [
+      {
+        t: '객관식',
+        q: '다음 중 운영체제가 아닌 것은?',
+        o: ['Windows', 'macOS', 'Python', 'Linux'],
+        a: 2,
+        e: 'Python은 프로그래밍 언어이며, 나머지는 운영체제입니다.'
+      }
+    ],
+    실전: [],
+    심화: []
+  }
+};
+
+/* ========== 기본 문제 생성 ========== */
+function generateDefaultQuestions(subject, difficulty) {
+  const bank = QUESTIONBANK[subject] || {};
+  const qs = bank[difficulty] || [];
+  if (qs.length === 0) {
+    return [{
+      t: '객관식',
+      q: `${SUBINFO[subject].name} 기초 문제 — 계속 학습하기 위해 API 키를 설정하세요.`,
+      o: ['학습 시작', '설정 열기', '문제 갱신', '계속'],
+      a: 0,
+      e: '⚙️ 설정 버튼에서 Gemini API 키를 입력해 주세요.'
+    }];
+  }
+  return qs.slice().map(q => ({ ...q }));
+}
+
+/* ========== 친절한 오류 메시지 변환 ========== */
+function friendlyError(e) {
+  const m = (e && e.message ? e.message : String(e)) || '';
+  if (/API key not valid|API_KEY_INVALID|400/.test(m)) return 'API 키가 올바르지 않아요. ⚙️ 설정에서 Gemini 키를 다시 확인해 주세요.';
+  if (/403|PERMISSION|permission/.test(m)) return 'API 키 권한 문제예요. Google AI Studio에서 키가 활성화됐는지 확인해 주세요.';
+  if (/429|quota|RESOURCE_EXHAUSTED/.test(m)) return '잠시 요청이 많았어요(사용량 한도). 1~2분 후 다시 시도해 주세요.';
+  if (/Failed to fetch|NetworkError|network/i.test(m)) return '인터넷 연결을 확인해 주세요. 연결 후 다시 시도하면 됩니다.';
+  if (/404|not found|NOT_FOUND/.test(m)) return '선택한 Gemini 모델을 찾을 수 없어요. ⚙️ 설정에서 다른 모델을 선택해 주세요.';
+  return 'AI 호출 중 문제가 생겼어요: ' + m;
+}
+
+/* ========== AI 문제 생성 (Gemini · 모듈 연동) ========== */
+async function genAIQuestions(subject) {
+  const key = localStorage.getItem('gkey');
+  if (!key) {
+    toast('⚙️ 설정에서 Gemini API 키를 입력하세요.');
+    return false;
+  }
+
+  const subName = SUBINFO[subject].name;
+  const panel = document.getElementById('panel-' + subject);
+  panel.querySelector('.loading').classList.add('show');
+  panel.querySelector('.qarea').innerHTML = '';
+
+  try {
+    let items;
+    // googleapi-module.js가 로드돼 있으면 '3개년 함정선지 강화' 프롬프트 사용
+    if (typeof googleAPI !== 'undefined' && typeof googleAPI.generateQuestions === 'function') {
+      googleAPI.updateCredentials();
+      items = toQuestionItems(await googleAPI.generateQuestions(subject, state.diff));
+    } else {
+      items = await _genAIQuestionsInline(subject);
+    }
+
+    if (!items || items.length === 0) throw new Error('유효한 문제가 없습니다');
+
+    state.cur[subject] = items;
+    renderPanel(subject);
+    toast(`AI가 ${subName} 문제 ${items.length}개를 생성했어요! ✨`);
+    return true;
+
+  } catch (e) {
+    console.error('AI 생성 오류:', e);
+    toast('⚠️ ' + friendlyError(e) + ' (지금은 기본 문제로 출제할게요)');
+    state.cur[subject] = generateDefaultQuestions(subject, state.diff);
+    renderPanel(subject);
+    return false;
+  } finally {
+    panel.querySelector('.loading').classList.remove('show');
+  }
+}
+
+// 모듈이 없을 때를 위한 내장 폴백 생성기
+async function _genAIQuestionsInline(subject) {
+  const key = localStorage.getItem('gkey');
+  const model = localStorage.getItem('gmodel') || 'gemini-3.5-flash';
+  const subName = SUBINFO[subject].name;
+  const prompt = `너는 ${subName} 계리직 공무원 시험 출제위원이다. 최근 3개년 기출 경향을 반영하고
+함정 선지를 포함한 난이도 '${state.diff}'의 4지선다 객관식 ${COUNT}개를 JSON 배열로만 출력하라. 마크다운 금지.
+[{"question":"문제","options":["① ","② ","③ ","④ "],"answer":0,"explanation":"풀이"}]`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
+    })
+  });
+  if (!response.ok) {
+    let detail = 'HTTP ' + response.status;
+    try { const er = await response.json(); if (er.error && er.error.message) detail = er.error.message; } catch (_) {}
+    throw new Error(detail);
+  }
+  const data = await response.json();
+  const candidate = (data.candidates && data.candidates[0]) || {};
+  let text = (candidate.content && Array.isArray(candidate.content.parts))
+    ? candidate.content.parts.map(p => p.text || '').join('') : '';
+  text = text.trim().replace(/```json/gi, '').replace(/```/g, '');
+  const first = text.indexOf('['), last = text.lastIndexOf(']');
+  if (first === -1 || last === -1) throw new Error('JSON 배열을 찾을 수 없습니다');
+  return toQuestionItems(JSON.parse(text.slice(first, last + 1)));
+}
+
+/* ========== 공식 자료 검색 (Custom Search JSON API) ========== */
+async function searchOfficialMaterials(query) {
+  const key = localStorage.getItem('skey');
+  const cx = localStorage.getItem('cxid');
+  if (!key || !cx) {
+    toast('⚙️ 설정에서 검색 API 키와 Search Engine ID를 입력하세요.');
+    return null;
+  }
+  const url = `https://www.googleapis.com/customsearch/v1?key=${encodeURIComponent(key)}`
+    + `&cx=${encodeURIComponent(cx)}&q=${encodeURIComponent(query)}&num=10`;
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    let detail = 'HTTP ' + resp.status;
+    try { const e = await resp.json(); if (e.error && e.error.message) detail = e.error.message; } catch (_) {}
+    throw new Error(detail);
+  }
+  const data = await resp.json();
+  return data.items || [];
+}
+
+/* ========== 자료 → 문제 (URL 본문 우선, 실패 시 주제 기반 폴백) ========== */
+async function loadMaterialFromURL(url, meta) {
+  const modal = document.getElementById('modal');
+  const card = document.getElementById('modalCard');
+  meta = meta || {};
+
+  card.innerHTML = '<h2>📄 자료 로드</h2><div class="loading show"><div class="spin"></div>자료 본문을 가져오는 중…</div>';
+
+  // 1) URL 본문 직접 추출 시도 (CORS 차단 사이트는 실패할 수 있음)
+  let materialText = '';
+  try {
+    const response = await fetch(url);
+    if (response.ok) {
+      const html = await response.text();
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      materialText = (temp.innerText || temp.textContent || '').replace(/\s+/g, ' ').trim();
+    }
+  } catch (e) {
+    console.warn('본문 직접 추출 실패(CORS 가능성):', e);
+  }
+
+  // 2) 본문이 충분하면 그대로 분석, 아니면 제목+요약(주제)으로 폴백
+  let result, sourceNote;
+  if (materialText && materialText.length > 200) {
+    card.innerHTML = '<h2>📄 자료 분석</h2><div class="loading show"><div class="spin"></div>본문을 분석해 문제를 생성 중…</div>';
+    result = await analyzeMaterial(materialText, false);
+    sourceNote = '자료 본문';
+  } else {
+    const topic = [meta.title, meta.snippet].filter(Boolean).join('\n') || url;
+    card.innerHTML = '<h2>📄 주제 기반 생성</h2><div class="loading show"><div class="spin"></div>본문을 직접 읽을 수 없어, 제목·요약을 바탕으로 문제를 생성 중…</div>';
+    result = await analyzeMaterial(topic, true);
+    sourceNote = '검색 주제';
+  }
+
+  const items = toQuestionItems(result);
+  if (items.length) {
+    state.cur[state.active] = items;
+    renderPanel(state.active);
+    modal.classList.remove('show');
+    toast(`✨ ${sourceNote}로 ${items.length}개 문제를 생성했어요!`);
+  } else {
+    card.innerHTML = `<h2>❌ 문제 생성 실패</h2>
+      <p style="color:var(--sub)">자료를 분석하지 못했습니다. Gemini 키를 확인하거나 다른 자료로 다시 시도해 주세요.</p>
+      <button class="btn" onclick="document.getElementById('modal').classList.remove('show')">닫기</button>`;
+  }
+}
+
+// Gemini 응답(JSON 배열)을 내부 문제 형식으로 변환
+function toQuestionItems(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map(o => ({
+    t: '객관식',
+    q: String(o.question || o.q || ''),
+    o: (o.options || o.o || []).map(String),
+    a: Math.max(0, Math.min(((o.options || o.o || []).length || 1) - 1, parseInt(o.answer != null ? o.answer : o.a) || 0)),
+    e: String(o.explanation || o.explain || o.e || '')
+  })).filter(it => it.q && it.o.length >= 2);
+}
+
+async function analyzeMaterial(material, topicMode) {
+  const key = localStorage.getItem('gkey');
+  if (!key) {
+    toast('⚙️ 설정에서 Gemini API 키를 입력하세요.');
+    return null;
+  }
+
+  const subject = SUBINFO[state.active].name;
+  const diff = state.diff;
+  const prompt = topicMode
+    ? `너는 ${subject} 공무원 시험 출제 전문가다. 아래 주제/제목/요약을 참고하고, 네 지식과 2024년 이후 최신 출제 경향을 활용해
+난이도 '${diff}'의 객관식 문제 ${COUNT}개를 만들어라. JSON 배열로만 출력하고 다른 말은 절대 추가하지 말라.
+
+주제:
+${String(material).slice(0, 1500)}
+
+[{"type":"객관식","question":"문제","options":["① 선지","② 선지","③ 선지","④ 선지"],"answer":0,"explanation":"풀이"}]`
+    : `다음 학습 자료에서 ${subject} 시험에 나올 수 있는 핵심 개념을 분석해
+난이도 '${diff}'의 객관식 문제 ${COUNT}개를 만들어라. JSON 배열로만 출력하고 다른 말은 절대 추가하지 말라.
+
+자료:
+${String(material).slice(0, 4000)}
+
+[{"type":"객관식","question":"문제","options":["① 선지","② 선지","③ 선지","④ 선지"],"answer":0,"explanation":"풀이"}]`;
+
+  try {
+    const model = localStorage.getItem('gmodel') || 'gemini-3.5-flash';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7, responseMimeType: "application/json" }
+      })
+    });
+
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const d = await resp.json();
+    const cand = (d.candidates && d.candidates[0]) || {};
+    let txt = cand.content && cand.content.parts ? cand.content.parts.map(p => p.text || '').join('') : '';
+    txt = txt.trim().replace(/```json/gi, '').replace(/```/g, '');
+    const f = txt.indexOf('['), l = txt.lastIndexOf(']');
+    if (f === -1 || l === -1) return null;
+    return JSON.parse(txt.slice(f, l + 1));
+  } catch (e) {
+    console.error('자료 분석 실패:', e);
+    return null;
+  }
+}
+
+/* ========== 패널 생성 ========== */
+const app = document.getElementById('app');
+SUBJECTS.forEach(sub => {
+  const p = document.createElement('div');
+  p.className = 'panel' + (sub === 'postal' ? ' active' : '');
+  p.id = 'panel-' + sub;
+  p.innerHTML = `<div class="secthead">
+    <span class="bar" style="background:${SUBINFO[sub].color}"></span>
+    <h2>${SUBINFO[sub].name}</h2>
+    <span class="cnt"></span>
+  </div>
+  <div class="loading"><div class="spin"></div>문제를 준비하고 있어요…</div>
+  <div class="qarea"></div>
+  <div class="actions">
+    <button class="btn grade">✅ 채점하기</button>
+    <button class="btn ghost reset">🔁 다시 풀기</button>
+  </div>
+  <div class="result"></div>`;
+  app.appendChild(p);
+  p.querySelector('.btn.grade').addEventListener('click', () => grade(sub));
+  p.querySelector('.btn.reset').addEventListener('click', () => {
+    state.cur[sub] = state.ai && localStorage.getItem('gkey')
+      ? null : generateDefaultQuestions(sub, state.diff);
+    if (!state.cur[sub]) {
+      genAIQuestions(sub);
+    } else {
+      renderPanel(sub);
+      toast('새 문제로 다시 풀어요!');
+    }
+  });
+});
+
+function renderPanel(sub) {
+  if (!state.cur[sub] || !state.cur[sub].length) {
+    state.cur[sub] = generateDefaultQuestions(sub, state.diff);
+  }
+
+  const panel = document.getElementById('panel-' + sub);
+  const qs = state.cur[sub];
+  state.answers[sub] = {};
+
+  panel.querySelector('.cnt').textContent = `난이도 ${state.diff} · ${qs.length}문항`;
+  const area = panel.querySelector('.qarea');
+  area.innerHTML = '';
+  panel.querySelector('.result').className = 'result';
+
+  qs.forEach((it, i) => {
+    const qd = document.createElement('div');
+    qd.className = 'q qcard';
+
+    let h = `<div class="qno"><span class="num">${i + 1}.</span><span class="type">${it.t}</span></div>`;
+    h += `<div class="qtext"></div>`;
+    h += `<button class="speaker" type="button">🔊 문제 읽어주기</button>`;
+    if (it.o) {
+      h += `<div class="opts">`;
+      it.o.forEach((op, oi) => {
+        h += `<label class="opt"><span class="mark">${'①②③④⑤'[oi]}</span><span class="optx"></span></label>`;
+      });
+      h += `</div>`;
+    } else {
+      h += `<div class="short"><input type="text" placeholder="답을 입력하세요"></div>`;
+    }
+    h += `<div class="qactions"></div>`;
+    h += `<div class="explain"></div>`;
+
+    qd.innerHTML = h;
+    qd.querySelector('.qtext').textContent = it.q;
+
+    if (it.o) {
+      qd.querySelectorAll('.optx').forEach((el, oi) => el.textContent = it.o[oi]);
+    }
+
+    // 음성 읽기: 문제 + 선지를 또박또박 읽어줌
+    qd.querySelector('.speaker').addEventListener('click', (e) => {
+      let readText = it.q;
+      if (it.o) readText += '. 보기. ' + it.o.map((op, oi) => `${oi + 1}번, ${op}`).join('. ');
+      speak(readText, e.currentTarget);
+    });
+
+    if (it.o) {
+      qd.querySelectorAll('.opt').forEach((el, oi) => el.addEventListener('click', () => {
+        state.answers[sub][i] = oi;
+        qd.querySelectorAll('.opt').forEach((x, k) => x.classList.toggle('sel', k === oi));
+      }));
+    } else {
+      const inp = qd.querySelector('input[type=text]');
+      inp.addEventListener('input', e => state.answers[sub][i] = e.target.value);
+    }
+
+    area.appendChild(qd);
+  });
+}
+
+/* ========== 채점 ========== */
+function grade(sub) {
+  const qs = state.cur[sub];
+  if (!qs || !qs.length) return;
+
+  const panel = document.getElementById('panel-' + sub);
+  const area = panel.querySelector('.qarea');
+  const cards = area.querySelectorAll('.qcard');
+
+  let correct = 0, total = 0;
+  const wrongs = [];
+
+  qs.forEach((it, i) => {
+    const card = cards[i];
+    const ex = card.querySelector('.explain');
+
+    if (it.o) {
+      total++;
+      const chosen = state.answers[sub][i];
+      card.querySelectorAll('.opt').forEach((el, oi) => {
+        el.classList.remove('sel', 'correct', 'wrong');
+        if (oi === it.a) el.classList.add('correct');
+        if (chosen === oi && chosen !== it.a) el.classList.add('wrong');
+      });
+
+      const ok = chosen === it.a;
+      if (ok) correct++;
+      else wrongs.push({ it, i });
+
+      ex.className = 'explain show' + (ok ? '' : ' miss');
+      ex.innerHTML = (ok ? '<b>정답! 🎉</b> ' : `<b>정답: ${'①②③④⑤'[it.a]}</b> `) + (it.e || '');
+    } else {
+      total++;
+      const inp = card.querySelector('input[type=text]');
+      const val = state.answers[sub][i];
+      const ok = (it.a || []).some(an => norm(an) === norm(val));
+
+      inp.classList.remove('correct', 'wrong');
+      inp.classList.add(ok ? 'correct' : 'wrong');
+      if (ok) correct++;
+      else wrongs.push({ it, i });
+
+      ex.className = 'explain show' + (ok ? '' : ' miss');
+      ex.innerHTML = (ok ? '<b>정답! 🎉</b> ' : `<b>정답: ${(it.a && it.a[0]) || ''}</b> `) + (it.e || '');
+    }
+  });
+
+  const pct = total ? Math.round(correct / total * 100) : 0;
+  addStars(correct);
+  addXP(correct * 5 + (pct === 100 ? 20 : 0));
+
+  // 합격 예상률 산출용 누적 정답률 기록 (영구 저장)
+  profile.totalCorrect = (profile.totalCorrect || 0) + correct;
+  profile.totalAnswered = (profile.totalAnswered || 0) + total;
+  if (pct >= 80) profile.badges[sub] = true;   // 80점 이상이면 과목 합격 배지
+  saveProfile();
+  renderDashboard();
+
+  const stars = '⭐'.repeat(Math.max(1, Math.round(pct / 20)));
+  let msg = pct === 100 ? '완벽해요! 🎉' : pct >= 80 ? '아주 잘했어요!' : pct >= 60 ? '좋아요!' : '더 노력해봐요!';
+
+  const res = panel.querySelector('.result');
+  res.className = 'result show';
+  res.innerHTML = `<div class="stars">${stars}</div>
+    <div class="score">${correct}<small> / ${total}점</small></div>
+    <div class="msg">${pct}점 · ${msg}</div>`;
+
+  res.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // 오답 노트 저장 (세션 + 영구 저장소 동시 기록)
+  if (wrongs.length > 0) {
+    if (!state.wrongNotes[sub]) state.wrongNotes[sub] = [];
+    state.wrongNotes[sub].push(...wrongs);
+    persistWrongNotes(sub, wrongs);
+    showWrongNotes(sub);
+  }
+}
+
+/* 오답을 영구 저장소(wrongNoteManager + localStorage)에 기록 */
+function persistWrongNotes(sub, wrongs) {
+  try {
+    if (typeof wrongNoteManager !== 'undefined') {
+      wrongs.forEach(w => {
+        const correctText = (w.it.o && w.it.o[w.it.a] != null) ? w.it.o[w.it.a] : (Array.isArray(w.it.a) ? w.it.a[0] : w.it.a);
+        wrongNoteManager.addWrong(SUBINFO[sub].name, w.i + 1, w.it.q, correctText, w.it.e);
+      });
+    }
+  } catch (e) { console.warn('오답 영구저장 실패:', e); }
+  // 화면 복원용 가벼운 스냅샷도 저장
+  try {
+    const snap = JSON.parse(localStorage.getItem('wrongNotesState') || '{}');
+    snap[sub] = (snap[sub] || []).concat(wrongs.map(w => ({ i: w.i, it: w.it })));
+    localStorage.setItem('wrongNotesState', JSON.stringify(snap));
+  } catch (e) {}
+}
+
+/* ========== 오답 노트 표시 ========== */
+function showWrongNotes(sub) {
+  const wrongArea = document.getElementById('wrongNoteArea');
+  const notes = state.wrongNotes[sub] || [];
+  if (notes.length === 0) return;
+
+  let html = `<div class="note-section">
+    <h4>❌ ${SUBINFO[sub].name} 오답 노트 (${notes.length}문항)</h4>`;
+
+  notes.forEach((w, idx) => {
+    html += `<div class="note-item">
+      <span class="note-num">${w.i + 1}번</span>
+      <div class="note-text"><strong>${w.it.q}</strong><br>
+      <span style="color:var(--sub);font-size:12px">💡 ${w.it.e}</span></div>
+    </div>`;
+  });
+
+  html += `<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn small" style="flex:1" onclick="analyzeWrongAnswersAdvanced('${sub}')">🧠 AI 약점 분석</button>
+      <button class="btn ghost small" style="flex:1" onclick="downloadWrongNotes('${sub}')">📥 오답 노트 다운로드</button>
+    </div></div>`;
+
+  wrongArea.innerHTML = html;
+}
+
+function downloadWrongNotes(sub) {
+  const notes = state.wrongNotes[sub] || [];
+  let txt = `=== ${SUBINFO[sub].name} 오답 노트 ===\n생성일: ${new Date().toLocaleString()}\n\n`;
+  notes.forEach((w, i) => {
+    txt += `${i + 1}. [${w.it.t}] ${w.it.q}\n   💡 ${w.it.e}\n\n`;
+  });
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${SUBINFO[sub].name}_오답노트_${new Date().toISOString().slice(0, 10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ========== 게이미피케이션 ========== */
+let profile;
+try { profile = JSON.parse(localStorage.getItem('profile')) || {}; }
+catch (e) { profile = {}; }
+profile.stars = profile.stars || 0;
+profile.xp = profile.xp || 0;
+profile.badges = profile.badges || {};
+profile.totalCorrect = profile.totalCorrect || 0;
+profile.totalAnswered = profile.totalAnswered || 0;
+profile.examDate = profile.examDate || '';
+
+function saveProfile() { localStorage.setItem('profile', JSON.stringify(profile)); }
+function levelOf(xp) { return Math.floor(xp / 100) + 1; }
+function addXP(n) { if (n <= 0) return; profile.xp += n; saveProfile(); renderDashboard(); }
+function addStars(n) { if (n <= 0) return; profile.stars += n; saveProfile(); renderDashboard(); }
+
+/* 사모님께 보내는 합격 응원 메시지 (랜덤 로테이션) */
+const CHEERS = [
+  '사모님, 오늘 푼 한 문제가 합격으로 가는 한 걸음입니다. 강사님이 옆에서 응원할게요! 💪',
+  '꾸준함이 합격을 만듭니다. 사모님은 이미 합격의 길 위에 계세요. 🌱',
+  '틀린 문제가 곧 합격 점수입니다. 오답이 쌓일수록 실력도 쌓여요! 📈',
+  '시험장에서 “이거 풀어봤다!” 하는 순간을 위해, 오늘도 한 세트 더! 🎯',
+  '사모님의 합격을 가장 확신하는 사람은 바로 저(강사)입니다. 끝까지 함께해요! 🏆',
+  '하루 20문제면 시험 전까지 수천 문제. 그 누적이 합격을 증명합니다. ✨'
+];
+
+function renderCheer() {
+  const el = document.getElementById('cheerMsg');
+  if (!el) return;
+  const idx = Math.floor(Date.now() / 86400000) % CHEERS.length; // 날마다 바뀜
+  el.innerHTML = '🎓 ' + CHEERS[idx];
+}
+
+function renderDashboard() {
+  const lv = levelOf(profile.xp), into = profile.xp % 100;
+  document.getElementById('lvnum').textContent = lv;
+  document.getElementById('lvlabel').textContent = 'Lv.' + lv;
+  document.getElementById('lvring').style.setProperty('--p', into + '%');
+  document.getElementById('xpfill').style.width = into + '%';
+  document.getElementById('xptext').textContent = `다음 레벨까지 ${100 - into} XP · 누적 ${profile.xp} XP`;
+  document.getElementById('starBadge').innerHTML = '⭐ ' + profile.stars;
+
+  // D-Day
+  const ddayVal = document.getElementById('ddayVal');
+  const examInput = document.getElementById('examDate');
+  if (profile.examDate) {
+    if (examInput && examInput.value !== profile.examDate) examInput.value = profile.examDate;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const exam = new Date(profile.examDate + 'T00:00:00');
+    const diffDays = Math.ceil((exam - today) / 86400000);
+    if (diffDays > 0) ddayVal.textContent = 'D-' + diffDays;
+    else if (diffDays === 0) ddayVal.textContent = 'D-DAY';
+    else ddayVal.textContent = '시험 완료';
+  } else {
+    ddayVal.textContent = '날짜 설정';
+  }
+
+  // 합격 예상률 (누적 정답률 기반)
+  const passVal = document.getElementById('passVal');
+  const passLabel = document.getElementById('passLabel');
+  const passCard = document.getElementById('passCard');
+  const answered = profile.totalAnswered || 0;
+  if (answered >= 10) {
+    const acc = Math.round((profile.totalCorrect || 0) / answered * 100);
+    passVal.textContent = acc + '%';
+    passCard.classList.remove('safe', 'warn', 'danger');
+    if (acc >= 80) { passLabel.textContent = '합격 안정권'; passCard.classList.add('safe'); }
+    else if (acc >= 65) { passLabel.textContent = '합격권'; passCard.classList.add('safe'); }
+    else if (acc >= 50) { passLabel.textContent = '조금만 더!'; passCard.classList.add('warn'); }
+    else { passLabel.textContent = '분발 필요'; passCard.classList.add('danger'); }
+  } else {
+    passVal.textContent = '--%';
+    passLabel.textContent = `합격 예상 (10문제+)`;
+  }
+
+  const bw = document.getElementById('dashBadges');
+  bw.innerHTML = SUBJECTS.map(s =>
+    `<div class="badge${profile.badges[s] ? ' earned' : ''}">
+      <span class="bico">${profile.badges[s] ? '🏅' : '📚'}</span>${SUBINFO[s].name}
+    </div>`).join('');
+
+  renderCheer();
+}
+
+/* 시험 날짜(D-Day) 설정 — 한 번 정하면 영구 저장 */
+document.getElementById('examDate').addEventListener('change', e => {
+  profile.examDate = e.target.value;
+  saveProfile();
+  renderDashboard();
+  if (e.target.value) toast('시험일 저장 완료! D-Day 카운트가 시작돼요 📅');
+});
+document.getElementById('ddayCard').addEventListener('click', () => {
+  const inp = document.getElementById('examDate');
+  if (inp.showPicker) { try { inp.showPicker(); return; } catch (e) {} }
+  inp.focus();
+});
+
+/* ========== 컨트롤 ========== */
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  state.active = t.dataset.s;
+  document.getElementById('panel-' + state.active).classList.add('active');
+  if (!state.cur[state.active] || !state.cur[state.active].length) {
+    if (state.ai && localStorage.getItem('gkey')) {
+      genAIQuestions(state.active);
+    } else {
+      state.cur[state.active] = generateDefaultQuestions(state.active, state.diff);
+      renderPanel(state.active);
+    }
+  } else {
+    renderPanel(state.active);
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}));
+
+document.querySelectorAll('#diffSeg button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#diffSeg button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  state.diff = b.dataset.d;
+  state.cur = {};
+  if (state.ai && localStorage.getItem('gkey')) {
+    genAIQuestions(state.active);
+  } else {
+    state.cur[state.active] = generateDefaultQuestions(state.active, state.diff);
+    renderPanel(state.active);
+  }
+  toast('난이도: ' + state.diff);
+}));
+
+document.getElementById('reroll').addEventListener('click', () => {
+  if (state.ai && localStorage.getItem('gkey')) {
+    genAIQuestions(state.active);
+  } else {
+    state.cur[state.active] = generateDefaultQuestions(state.active, state.diff);
+    renderPanel(state.active);
+    toast('새 문제를 준비했어요!');
+  }
+});
+
+document.getElementById('uploadBtn').addEventListener('click', () => {
+  const modal = document.getElementById('modal');
+  const card = document.getElementById('modalCard');
+  
+  const hasCX = !!localStorage.getItem('skey') && !!localStorage.getItem('cxid');
+  let tab = hasCX ? 'search' : 'input';
+
+  function renderMaterialUI() {
+    card.innerHTML = `<h2>📄 학습 자료</h2>
+      <div style="display:flex;gap:8px;margin-bottom:15px;border-bottom:2px solid var(--line);padding-bottom:10px">
+        <button id="tabInput" class="btn ghost ${tab === 'input' ? '' : 'ghost'}" style="font-weight:${tab === 'input' ? 'bold' : 'normal'}">
+          📝 직접 입력
+        </button>
+        <button id="tabSearch" class="btn ghost ${tab === 'search' ? '' : 'ghost'}" style="font-weight:${tab === 'search' ? 'bold' : 'normal'};opacity:${hasCX ? '1' : '0.5'};cursor:${hasCX ? 'pointer' : 'not-allowed'}">
+          🔍 공식 자료 검색 ${!hasCX ? '(미설정)' : ''}
+        </button>
+      </div>`;
+
+    if (tab === 'search' && hasCX) {
+      // API 기반 공식 자료 검색 — 결과를 앱 내부에서 바로 분석에 연결
+      card.innerHTML += `<div style="margin-bottom:8px;color:var(--sub);font-size:13px">🔍 Google 검색에서 ${SUBINFO[state.active].name} 관련 공식 자료를 찾아 바로 문제로 만듭니다.</div>
+        <div class="searchbar">
+          <input type="text" id="searchQuery" placeholder="예: ${SUBINFO[state.active].name} 기출 요약" value="${SUBINFO[state.active].name}">
+          <button id="doSearch" class="btn small">검색</button>
+          <button id="autoFirst" class="btn ghost small" title="첫 번째 결과를 자동으로 불러와 분석">⚡ 첫 결과 자동분석</button>
+        </div>
+        <div class="sresults" id="sresults"></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button id="closeMat" class="btn ghost" style="flex:1">취소</button>
+        </div>`;
+
+      const resultsBox = document.getElementById('sresults');
+
+      async function runSearch() {
+        const q = document.getElementById('searchQuery').value.trim();
+        if (!q) { toast('검색어를 입력하세요'); return null; }
+        resultsBox.innerHTML = '<div class="loading show"><div class="spin"></div>검색 중…</div>';
+        try {
+          const items = await searchOfficialMaterials(q);
+          if (!items || items.length === 0) {
+            resultsBox.innerHTML = '<div style="color:var(--sub);font-size:13px;padding:12px">검색 결과가 없습니다.</div>';
+            return [];
+          }
+          resultsBox.innerHTML = items.map((it, idx) => `
+            <div class="sresult">
+              <div class="stitle">${idx + 1}. ${(it.title || '').replace(/</g, '&lt;')}</div>
+              <div class="slink">${(it.displayLink || it.link || '')}</div>
+              <div class="ssnip">${(it.snippet || '').replace(/</g, '&lt;')}</div>
+              <div class="sactions">
+                <button class="btn small" data-idx="${idx}">✨ 이 자료로 문제 만들기</button>
+                <a class="btn ghost small" href="${it.link}" target="_blank" rel="noopener" style="text-decoration:none">↗ 원문 보기</a>
+              </div>
+            </div>`).join('');
+          resultsBox.querySelectorAll('[data-idx]').forEach(btn =>
+            btn.addEventListener('click', () => {
+              const it = items[parseInt(btn.dataset.idx)];
+              loadMaterialFromURL(it.link, { title: it.title, snippet: it.snippet });
+            }));
+          return items;
+        } catch (e) {
+          resultsBox.innerHTML = `<div style="color:var(--error);font-size:13px;padding:12px">검색 실패: ${e.message}</div>`;
+          return null;
+        }
+      }
+
+      document.getElementById('doSearch').addEventListener('click', runSearch);
+      document.getElementById('searchQuery').addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
+      document.getElementById('autoFirst').addEventListener('click', async () => {
+        const items = await runSearch();
+        if (items && items.length > 0) loadMaterialFromURL(items[0].link, { title: items[0].title, snippet: items[0].snippet });
+      });
+      document.getElementById('tabInput').addEventListener('click', () => { tab = 'input'; renderMaterialUI(); });
+      document.getElementById('closeMat').addEventListener('click', () => modal.classList.remove('show'));
+
+    } else {
+      card.innerHTML += `<div class="field">
+        <label>학습 자료 텍스트/URL</label>
+        <textarea id="materialText" style="width:100%;height:200px;padding:10px;border-radius:12px;border:2px solid var(--line)" placeholder="텍스트를 붙여넣거나 URL을 입력하세요"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button id="analyzeMat" class="btn">✨ 분석하기</button>
+        <button id="closeMat" class="btn ghost" style="flex:1">취소</button>
+      </div>`;
+
+      document.getElementById('tabSearch').addEventListener('click', () => { if(hasCX) { tab = 'search'; renderMaterialUI(); } });
+      document.getElementById('analyzeMat').addEventListener('click', async () => {
+        const text = document.getElementById('materialText').value.trim();
+        if (!text) { toast('텍스트를 입력하세요'); return; }
+
+        // URL 한 줄만 넣은 경우 → 본문 추출/주제 폴백 경로 사용
+        if (/^https?:\/\/\S+$/i.test(text)) {
+          loadMaterialFromURL(text);
+          return;
+        }
+
+        card.innerHTML = '<div class="loading show"><div class="spin"></div>자료를 분석하고 있어요…</div>';
+        const items = toQuestionItems(await analyzeMaterial(text, false));
+
+        if (items.length) {
+          state.cur[state.active] = items;
+          renderPanel(state.active);
+          modal.classList.remove('show');
+          toast(`자료 기반 문제 ${items.length}개가 생성되었어요! ✨`);
+        } else {
+          toast('분석 실패 — Gemini 키를 확인하세요.');
+          modal.classList.remove('show');
+        }
+      });
+    }
+
+    document.getElementById('closeMat').addEventListener('click', () => modal.classList.remove('show'));
+  }
+
+  modal.classList.add('show');
+  renderMaterialUI();
+});
+
+document.getElementById('gear').addEventListener('click', () => {
+  document.getElementById('settings').classList.toggle('show');
+});
+
+document.getElementById('saveKey').addEventListener('click', () => {
+  const gk = document.getElementById('gkey').value.trim();
+  const gm = document.getElementById('gmodel').value.trim();
+  const sk = document.getElementById('skey').value.trim();
+  const cx = document.getElementById('cxid').value.trim();
+  const ok = document.getElementById('okey').value.trim();
+
+  if (gk) localStorage.setItem('gkey', gk);
+  if (gm) localStorage.setItem('gmodel', gm);
+  if (sk) localStorage.setItem('skey', sk);
+  if (cx) localStorage.setItem('cxid', cx);
+  if (ok) localStorage.setItem('okey', ok);
+
+  // Gemini 키가 있으면 AI 출제를 자동으로 켠다 (사용자가 명시적으로 끈 경우는 존중)
+  if (localStorage.getItem('gkey') && localStorage.getItem('gai') !== '0') {
+    document.getElementById('aiToggle').checked = true;
+  }
+  state.ai = document.getElementById('aiToggle').checked;
+  localStorage.setItem('gai', state.ai ? '1' : '0');
+
+  // 모듈에도 최신 키 반영
+  if (typeof googleAPI !== 'undefined') googleAPI.updateCredentials();
+
+  refreshKeyStat();
+  toast('저장 완료! 💾 한 번 저장하면 다시 입력할 필요 없어요.');
+
+  // 저장 직후 현재 과목을 AI 문제로 즉시 교체해 바로 체감되게
+  if (state.ai && localStorage.getItem('gkey')) {
+    state.cur = {};
+    genAIQuestions(state.active);
+  }
+});
+
+document.getElementById('clearKey').addEventListener('click', () => {
+  ['gkey', 'gmodel', 'skey', 'cxid', 'okey', 'gai'].forEach(k => localStorage.removeItem(k));
+  document.getElementById('gkey').value = '';
+  document.getElementById('gmodel').value = '';
+  document.getElementById('skey').value = '';
+  document.getElementById('cxid').value = '';
+  document.getElementById('okey').value = '';
+  document.getElementById('aiToggle').checked = false;
+  state.ai = false;
+  refreshKeyStat();
+  toast('저장된 키를 모두 지웠어요');
+});
+
+document.getElementById('aiToggle').addEventListener('change', e => {
+  state.ai = e.target.checked;
+  localStorage.setItem('gai', state.ai ? '1' : '0');
+});
+
+function refreshKeyStat() {
+  const g = localStorage.getItem('gkey');
+  const s = localStorage.getItem('skey');
+  const o = localStorage.getItem('okey');
+  const parts = [];
+  parts.push(g ? '<span style="color:var(--success)">Gemini ✓</span>' : 'Gemini ✗');
+  parts.push(s ? '<span style="color:var(--success)">검색 ✓</span>' : '검색 ✗');
+  parts.push(o ? '<span style="color:var(--success)">음성 ✓</span>' : '음성 ✗');
+  document.getElementById('keyStat').innerHTML = '상태: ' + parts.join(' · ');
+}
+
+/* ========== 초기화 ========== */
+window.addEventListener('load', () => {
+  if (localStorage.getItem('gkey')) document.getElementById('gkey').value = localStorage.getItem('gkey');
+  if (localStorage.getItem('gmodel')) document.getElementById('gmodel').value = localStorage.getItem('gmodel');
+  if (localStorage.getItem('skey')) document.getElementById('skey').value = localStorage.getItem('skey');
+  if (localStorage.getItem('cxid')) document.getElementById('cxid').value = localStorage.getItem('cxid');
+  if (localStorage.getItem('okey')) document.getElementById('okey').value = localStorage.getItem('okey');
+  // Gemini 키가 있으면 기본적으로 AI 출제 ON (명시적으로 끈 '0'만 예외)
+  const hasGkey = !!localStorage.getItem('gkey');
+  const aiOn = localStorage.getItem('gai') === '1' || (hasGkey && localStorage.getItem('gai') !== '0');
+  if (aiOn) {
+    document.getElementById('aiToggle').checked = true;
+    state.ai = true;
+  }
+  refreshKeyStat();
+
+  // 이전에 저장해 둔 오답 노트 복원 (앱을 껐다 켜도 유지)
+  try {
+    const snap = JSON.parse(localStorage.getItem('wrongNotesState') || '{}');
+    Object.keys(snap).forEach(s => { state.wrongNotes[s] = snap[s] || []; });
+  } catch (e) {}
+
+  renderDashboard();
+  if (state.wrongNotes[state.active] && state.wrongNotes[state.active].length) showWrongNotes(state.active);
+
+  // AI가 켜져 있으면 시작 과목을 바로 AI 문제로, 아니면 기본 문제로
+  if (state.ai && hasGkey) {
+    genAIQuestions('postal');
+  } else {
+    state.cur['postal'] = generateDefaultQuestions('postal', state.diff);
+    renderPanel('postal');
+  }
+});
+
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target.id === 'modal') e.currentTarget.classList.remove('show');
+});
+</script>
+
+<!-- ===== 통합 모듈 (반드시 본체 스크립트 이후 로드) ===== -->
+<script src="googleapi-module.js"></script>
+<script src="integration.js"></script>
+
+<!-- ===== PWA: 앱 설치 + 오프라인 ===== -->
+<script>
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const b = document.getElementById('installBtn');
+  if (b) b.style.display = '';   // 설치 가능할 때 버튼 노출
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  const b = document.getElementById('installBtn');
+  if (b) b.style.display = 'none';
+  if (typeof toast === 'function') toast('설치 완료! 홈 화면에서 앱으로 열 수 있어요 🎉');
+});
+
+(function setupInstall() {
+  const b = document.getElementById('installBtn');
+  if (!b) return;
+
+  // 이미 설치되어 standalone으로 실행 중이면 버튼 숨김
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  // iOS는 beforeinstallprompt가 없으므로 버튼을 미리 보여 안내
+  if (isIOS && !standalone) b.style.display = '';
+
+  b.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch (e) {}
+      deferredPrompt = null;
+      b.style.display = 'none';
+    } else if (isIOS) {
+      if (typeof toast === 'function') toast('아이폰/아이패드: 공유(□↑) → "홈 화면에 추가"를 눌러주세요 📲');
+    } else {
+      if (typeof toast === 'function') toast('이미 설치됐거나, 브라우저 메뉴(⋮)의 "앱 설치"를 눌러주세요 📲');
+    }
+  });
+})();
+
+// 서비스워커 등록 (오프라인 캐시 + 설치 가능 조건 충족)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW 등록 실패:', err));
+  });
+}
+</script>
+
+</body>
+</html>
