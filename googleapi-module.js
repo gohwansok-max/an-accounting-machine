@@ -67,40 +67,50 @@ ${context ? `- 추가 반영: ${context}` : ''}
 지금 바로 20개 JSON 배열만 출력하세요. 다른 말은 절대 추가하지 마세요.`;
 
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(this.model)}:generateContent?key=${encodeURIComponent(this.gkey)}`;
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text: prompt }]
-          }],
-          generationConfig: {
-            temperature: 0.8,
-            topK: 40,
-            topP: 0.9,
-            responseMimeType: 'application/json'
-          }
-        })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`Gemini API 오류: ${error.error?.message || response.statusText}`);
-      }
-
-      const data = await response.json();
-      const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
+      const content = await this._generate(prompt, { temperature: 0.8, topK: 40, topP: 0.9, responseMimeType: 'application/json' });
       if (!content) throw new Error('응답이 비어있습니다');
-
       return this._parseJSON(content);
-
     } catch (error) {
       console.error('Gemini 문제 생성 실패:', error);
       throw error;
     }
+  }
+
+  /**
+   * Gemini 호출 (모델 자동 폴백) — 선택 모델이 404/400이면 안정 모델로 재시도
+   * @private
+   */
+  async _generate(prompt, genConfig) {
+    if (!this.gkey) throw new Error('Gemini API 키가 필요합니다');
+    const models = [this.model, 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash']
+      .filter((m, i, a) => m && a.indexOf(m) === i);
+    let lastErr;
+    for (const model of models) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(this.gkey)}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: genConfig || {} })
+        });
+        if (!response.ok) {
+          let msg = 'HTTP ' + response.status;
+          try { const e = await response.json(); if (e.error?.message) msg = e.error.message; } catch (_) {}
+          lastErr = new Error(msg);
+          // 모델이 없거나 요청형식 문제면 다음 모델로, 권한/쿼터면 즉시 중단
+          if (response.status === 404 || response.status === 400) continue;
+          throw lastErr;
+        }
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (text) { this._lastModelUsed = model; if (model !== this.model) console.warn('Gemini 모델 폴백 사용:', model); return text; }
+        lastErr = new Error('빈 응답');
+      } catch (e) {
+        lastErr = e;
+        if (/Failed to fetch|NetworkError/i.test(e.message || '')) throw e; // 네트워크는 재시도 의미 없음
+      }
+    }
+    throw lastErr || new Error('생성 실패');
   }
 
   /**
@@ -143,29 +153,8 @@ ${materialText.slice(0, 4000)}
 ]`;
 
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(this.model)}:generateContent?key=${encodeURIComponent(this.gkey)}`;
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text: prompt }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            responseMimeType: 'application/json'
-          }
-        })
-      });
-
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-      const data = await response.json();
-      const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
+      const content = await this._generate(prompt, { temperature: 0.7, responseMimeType: 'application/json' });
       return this._parseJSON(content);
-
     } catch (error) {
       console.error('자료 기반 생성 실패:', error);
       throw error;
@@ -235,27 +224,8 @@ ${questionsText}
 }`;
 
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(this.model)}:generateContent?key=${encodeURIComponent(this.gkey)}`;
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.6, responseMimeType: 'application/json' }
-        })
-      });
-
-      if (!response.ok) {
-        let msg = `HTTP ${response.status}`;
-        try { const e = await response.json(); if (e.error?.message) msg = e.error.message; } catch (_) {}
-        throw new Error(msg);
-      }
-
-      const data = await response.json();
-      const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const content = await this._generate(prompt, { temperature: 0.6, responseMimeType: 'application/json' });
       return this._parseAnalysis(content);
-
     } catch (error) {
       console.error('오답 분석 실패:', error);
       return { summary: '', weakConcepts: [], errorBreakdown: {}, perQuestion: [], feedback: '잠시 후 다시 시도해 주세요. (' + error.message + ')', recommendedTopics: [] };
@@ -300,12 +270,11 @@ ${questionsText}
 
     let jsonStr = text.slice(firstIdx, lastIdx + 1);
 
-    // 일반적인 문제 수정
+    // 안전한 보정만 수행 (값에 따옴표를 강제로 끼우던 기존 로직은 한글 콜론 문장을 깨뜨려 제거함)
     jsonStr = jsonStr
       .replace(/,\s*([\]}])/g, '$1')  // 트레일링 콤마 제거
-      .replace(/(["\w])\s*:\s*(?![\[{"\d])/g, '$1: "')  // 값 따옴표 추가
-      .replace(/[""]/g, '"')  // 스마트 따옴표 정상화
-      .replace(/['']/g, "'");  // 스마트 싱글 따옴표 정상화
+      .replace(/[“”]/g, '"')  // 스마트 큰따옴표 정상화
+      .replace(/[‘’]/g, "'");  // 스마트 작은따옴표 정상화
 
     try {
       const arr = JSON.parse(jsonStr);
